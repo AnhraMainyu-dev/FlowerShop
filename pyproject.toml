@@ -1,0 +1,15 @@
+[tool.black]
+line-length = 119
+target-version = ["py312"]
+extend-exclude = "migrations"
+
+[tool.isort]
+profile = "black"
+line_length = 119
+skip_gitignore = true
+skip_glob = ["*/migrations/*"]
+
+[tool.flake8]
+max-line-length = 119
+extend-ignore = ["E203"]
+extend-exclude = ["venv", ".venv", "migrations"]

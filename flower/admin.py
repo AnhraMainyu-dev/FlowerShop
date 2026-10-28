@@ -5,7 +5,7 @@ from .models import Bouquet, Order, OrderItems
 
 @admin.register(Bouquet)
 class BouquetAdmin(admin.ModelAdmin):
-    list_display = ["name", "heigth", "weigth", "description", "image", "price"]
+    list_display = ["name", "heigth", "width", "description", "image", "price"]
 
 
 class TabularOrder(admin.TabularInline):
@@ -15,5 +15,5 @@ class TabularOrder(admin.TabularInline):
 
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
-    list_display = ["first_name", "last_name", "email", "phone_number"]
+    list_display = ["first_name", "last_name", "email", "address", "phone_number", "status"]
     inlines = [TabularOrder]

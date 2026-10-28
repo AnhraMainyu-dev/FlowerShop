@@ -29,10 +29,10 @@ class Order(models.Model):
         verbose_name_plural = "Заказы"
 
     def __str__(self):
-        return f"{self.first_name} {self.last_name} {self.bouquet}"
+        return f"{self.first_name} {self.last_name}"
 
 
-class OrderItem(models.Model):
+class OrderItems(models.Model):
     order = models.ForeignKey(Order, related_name="items", on_delete=models.CASCADE, verbose_name="Заказ")
     bouquet = models.ForeignKey(Bouquet, related_name="order_items", on_delete=models.CASCADE, verbose_name="Детали")
     quantity = models.PositiveIntegerField(verbose_name="Количество")

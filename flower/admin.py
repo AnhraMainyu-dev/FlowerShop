@@ -15,5 +15,5 @@ class TabularOrder(admin.TabularInline):
 
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
-    list_display = ["first_name", "last_name", "email", "phone_number", "amount"]
+    list_display = ["first_name", "last_name", "email", "phone_number"]
     inlines = [TabularOrder]

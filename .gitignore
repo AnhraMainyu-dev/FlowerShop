@@ -32,3 +32,9 @@ htmlcov/
 # IDE
 .idea/
 .vscode/
+
+#media
+/media/
+
+#sqlite3
+/db.sqlite3

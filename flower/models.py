@@ -70,7 +70,7 @@ class Consultation(models.Model):
 
 class Occasions(models.Model):
     description = models.CharField(max_length=50, verbose_name="Повод для подарка")
-    orders = models.ManyToManyField(Order, related_name="occasions", verbose_name="Заказ")
+    bouquets = models.ManyToManyField(Bouquet, related_name="bouquets", verbose_name="Букет")
 
     class Meta:
         verbose_name = "Ситуация"

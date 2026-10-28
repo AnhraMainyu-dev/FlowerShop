@@ -1,14 +1,16 @@
+from django.utils import timezone
 from django.db import models
 from phonenumber_field.modelfields import PhoneNumberField
 
 
 class Bouquet(models.Model):
     name = models.CharField(max_length=50, verbose_name="Название")
-    heigth = models.IntegerField(verbose_name="Высота")
-    width = models.IntegerField(verbose_name="Ширина")
+    height = models.IntegerField(blank=True, null=True, verbose_name="Высота")
+    width = models.IntegerField(blank=True, null=True, verbose_name="Ширина")
     description = models.TextField(blank=True, null=True, verbose_name="Описание")
     image = models.ImageField(upload_to="bouquet/", verbose_name="Фото")
-    price = models.DecimalField(max_digits=7, decimal_places=0, verbose_name="Цена")
+    structure = models.TextField(blank=True, verbose_name='Состав букета')
+    price = models.DecimalField(max_digits=7, decimal_places=0, blank=True, null=True, verbose_name="Цена")
 
     class Meta:
         verbose_name = "Букет"
@@ -19,18 +21,24 @@ class Bouquet(models.Model):
 
 
 class Order(models.Model):
+    bouquet = models.ForeignKey(Bouquet, related_name='oreders', verbose_name='Букет', on_delete=models.CASCADE)
     first_name = models.CharField(max_length=30, verbose_name="Имя")
-    last_name = models.CharField(max_length=30, verbose_name="Фамилия")
-    email = models.EmailField(verbose_name="Эл.Почта")
-    address = models.CharField(max_length=100, verbose_name="Адрес")
+    address = models.CharField(max_length=100, blank=True, verbose_name="Адрес") 
     phone_number = PhoneNumberField(verbose_name="Телефон")
-    date_register = models.DateField(verbose_name="Дата регистрации", auto_now_add=True)
-    date_deliver = models.DateField(verbose_name="Дата завершения заказа")
+    date_register = models.DateTimeField(verbose_name='Дата создания заказа', auto_now_add=True)
+    date_deliver = models.CharField(max_length=15, choices=[
+        ('FA', 'Как можно скорее'),
+        ('MO', '08:00 - 11:00'),
+        ('PM', '11:00 - 14:00'),
+        ('BR', '14:00- 17:00'),
+        ('PB', '17:00 - 20:00')
+    ], db_index=True, blank=True, verbose_name='Время доставки')
     status = models.CharField(
         max_length=25,
         choices=[("RG", "Зарегистрирован"), ("WD", "Ожидает доставки"), ("FO", "Доставлен")],
         default="RG",
         db_index=True,
+        blank=True,
         verbose_name="Статус",
     )
 
@@ -39,26 +47,14 @@ class Order(models.Model):
         verbose_name_plural = "Заказы"
 
     def __str__(self):
-        return f"{self.first_name} {self.last_name} {self.date_register}"
-
-
-class OrderItems(models.Model):
-    order = models.ForeignKey(Order, related_name="items", on_delete=models.CASCADE, verbose_name="Заказ")
-    bouquet = models.ForeignKey(Bouquet, related_name="order_items", on_delete=models.CASCADE, verbose_name="Детали")
-    price = models.DecimalField(max_digits=10, decimal_places=0, verbose_name="Цена")
-
-    class Meta:
-        verbose_name = "Детали"
-        verbose_name_plural = "Детали заказа"
-
-    def __str__(self):
-        return f"{self.bouquet} {self.order}"
+        return f"{self.first_name} {self.date_register}"
 
 
 class Consultation(models.Model):
     first_name = models.CharField(max_length=30, verbose_name="Имя")
     phone_number = PhoneNumberField(verbose_name="Телефон")
     confirmation = models.BooleanField(default=False, verbose_name="Подтвердить")
+    date_statement = models.DateTimeField(auto_now_add=True, verbose_name='Дата создания заявки')
 
     class Meta:
         verbose_name = "Консультация"
@@ -70,8 +66,8 @@ class Consultation(models.Model):
 
 class Occasions(models.Model):
     description = models.CharField(max_length=50, verbose_name="Повод для подарка")
-    bouquets = models.ManyToManyField(Bouquet, related_name="bouquets", verbose_name="Букет")
-
+    bouquets = models.ManyToManyField(Bouquet, related_name="bouquets", blank=True, verbose_name="Букет")
+    
     class Meta:
         verbose_name = "Ситуация"
         verbose_name_plural = "Ситуации"

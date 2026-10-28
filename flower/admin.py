@@ -1,19 +1,17 @@
 from django.contrib import admin
-
-from .models import Bouquet, Order, OrderItems
+from .models import Bouquet, Order, Consultation
 
 
 @admin.register(Bouquet)
 class BouquetAdmin(admin.ModelAdmin):
-    list_display = ["name", "heigth", "width", "description", "image", "price"]
-
-
-class TabularOrder(admin.TabularInline):
-    model = OrderItems
-    extra = 1
+    list_display = ["name", "height", "width", "description", 'structure', "image", "price"]
 
 
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
-    list_display = ["first_name", "last_name", "email", "address", "phone_number", "status"]
-    inlines = [TabularOrder]
+    list_display = ['bouquet', 'first_name', 'address', 'phone_number', 'date_register', 'date_deliver', 'status']
+    
+
+@admin.register(Consultation)
+class ConsultationAdmin(admin.ModelAdmin):
+    list_display = ['first_name', 'phone_number', 'confirmation', 'date_statement']

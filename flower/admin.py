@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Bouquet, Consultation, Order
+from .models import Bouquet, Consultation, Occasions, Order
 
 
 @admin.register(Bouquet)
@@ -16,3 +16,9 @@ class OrderAdmin(admin.ModelAdmin):
 @admin.register(Consultation)
 class ConsultationAdmin(admin.ModelAdmin):
     list_display = ["first_name", "phone_number", "confirmation", "date_statement"]
+
+
+@admin.register(Occasions)
+class OccasionsAdmin(admin.ModelAdmin):
+    list_display = ["description"]
+    filter_horizontal = ["bouquets"]

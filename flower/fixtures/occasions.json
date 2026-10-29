@@ -1,0 +1,26 @@
+[
+  {
+    "model": "flower.occasions",
+    "pk": 1,
+    "fields": {
+      "description": "Свадьба",
+      "bouquets": [2, 3, 7]
+    }
+  },
+  {
+    "model": "flower.occasions",
+    "pk": 2,
+    "fields": {
+      "description": "День рождения",
+      "bouquets": [1, 2, 4, 6]
+    }
+  },
+  {
+    "model": "flower.occasions",
+    "pk": 3,
+    "fields": {
+      "description": "Без повода",
+      "bouquets": [1, 5, 6, 7]
+    }
+  }
+]

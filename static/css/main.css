@@ -50,6 +50,9 @@ input::placeholder {
 	color: #FFFFFF;
 	border: none;
 	cursor: pointer;
+	display: inline-block;
+	text-align: center;
+	text-decoration: none;
 }
 .btn:hover {
 	background: #14A87B;
@@ -159,6 +162,7 @@ bottom: 0;
 .banner__btn {
 	width: 188px;
 	height: 57px;
+	line-height: 57px;
 }
 .recommended__block {
 	display: flex;
@@ -187,6 +191,7 @@ bottom: 0;
 	width: 100%;
 	height: 57px;
 	margin-top: 30px;
+	line-height: 57px;
 }
 
 .contacts {

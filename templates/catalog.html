@@ -13,10 +13,10 @@
 	<header id="header">
 		<div class="container">
 			<div class="header ficb">
-				<a href="/"><img src="{% static 'img/logo.svg' %}" alt="logo" class="logo"></a>
+				<a href="{% url 'flower:index' %}"><img src="{% static 'img/logo.svg' %}" alt="logo" class="logo"></a>
 				<nav>
 					<ul class="menu ficc">
-						<li class="menu__item"><a href="#" class="menu__item_link">Каталог</a></li>
+						<li class="menu__item"><a href="{% url 'flower:catalog' %}" class="menu__item_link">Каталог</a></li>
 						<li class="menu__item"><a href="#" class="menu__item_link">Рекомендации</a></li>
 						<li class="menu__item"><a href="#" class="menu__item_link">Контакты</a></li>
 					</ul>
@@ -52,7 +52,24 @@
 		<div class="container">
 			<div class="consultation">
 				<div class="title consultation__title">Оставьте заявку на консультацию</div>
-				<form action="#" class="consultation__form">
+				{% if errors %}
+				<div style="background-color: #D9FAF1; border: 2px solid #17CF97; color: #17CF97; padding: 15px; border-radius: 10px; margin-bottom: 20px; text-align: center; font-weight: bold; font-size: 16px;">
+					{% for field, error_list in errors.items %}
+						{% for error in error_list %}
+							<p>{{ error }}</p>
+						{% endfor %}
+					{% endfor %}
+				</div>
+				{% endif %}
+				{% if messages %}
+				<div style="color: #fff; margin-bottom: 20px; text-align: center; font-weight: bold; font-size: 18px;">
+					{% for message in messages %}
+						<p style="margin: 0;">{{ message }}</p>
+					{% endfor %}
+				</div>
+				{% endif %}
+				<form method="post" action="{% url 'flower:catalog' %}" class="consultation__form">
+					{% csrf_token %}
 					<input type="text" name="fname" class="consultation__form_input" placeholder="Введите Имя" required>
 					<input type="text" name="tel" class="consultation__form_input" placeholder="+ 7 (999) 000 00 00" required>
 					<button type="submit" class="consultation__form_btn">Отправить</button>
@@ -63,10 +80,10 @@
 	<footer id="footer">
 		<div class="container">
 			<div class="footer">
-				<a href="/"><img src="{% static 'img/logo.svg' %}" alt="logo" class="logo footer__logo"></a>
+				<a href="{% url 'flower:index' %}"><img src="{% static 'img/logo.svg' %}" alt="logo" class="logo footer__logo"></a>
 				<nav>
 					<ul class="menu footer__menu ficc">
-						<li class="menu__item"><a href="#" class="menu__item_link">Каталог</a></li>
+						<li class="menu__item"><a href="{% url 'flower:catalog' %}" class="menu__item_link">Каталог</a></li>
 						<li class="menu__item"><a href="#" class="menu__item_link">Рекомендации</a></li>
 						<li class="menu__item"><a href="#" class="menu__item_link">Контакты</a></li>
 					</ul>

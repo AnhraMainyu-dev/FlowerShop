@@ -1,4 +1,5 @@
 from django.contrib import messages
+import phonenumbers
 from django.core.exceptions import ValidationError
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
@@ -98,19 +99,26 @@ def consultation(request):
 def order(request, pk):
     bouquet = get_object_or_404(Bouquet, pk=pk)
     if request.method == "POST":
-        item = Order(
-            bouquet=bouquet,
-            first_name=request.POST.get("fname", ""),
-            phone_number=request.POST.get("tel", ""),
-            address=request.POST.get("adres", ""),
-            date_deliver=SLOTS.get(request.POST.get("orderTime"), ""),
-        )
-        try:
-            item.full_clean()
-        except ValidationError as error:
-            return render(request, "order.html", {"bouquet": bouquet, "errors": error.message_dict})
-        item.save()
-        return redirect("flower:index")
+        parsed = phonenumbers.parse(request.POST["tel"])
+        if phonenumbers.is_valid_number(parsed):
+            item = Order(
+                bouquet=bouquet,
+                first_name=request.POST.get("fname", ""),
+                phone_number=request.POST.get("tel", ""),
+                address=request.POST.get("adres", ""),
+                date_deliver=SLOTS.get(request.POST.get("orderTime"), ""),
+            )
+        else:
+            return render(request, "order.html", {"bouquet": bouquet, "errors": {"phone_number": ["Неверный номер"]}})
+
+    try:
+        item.full_clean()
+    except ValidationError as error:
+        return render(request, "order.html", {"bouquet": bouquet, "errors": error.message_dict})
+
+    item.save()
+    return redirect("flower:index")
+
     return render(request, "order.html", {"bouquet": bouquet})
 
 

@@ -34,9 +34,9 @@
 				<div class="quiz__block">
 					<h1 class="quiz__title">К какому событию нужен букет?</h1>
 					<div class="quiz__elems fic">
-						<button class="quiz__elem">Свадьба</button>
-						<button class="quiz__elem">День рождения</button>
-						<button class="quiz__elem">Без повода</button>
+						{% for occasion in occasions %}
+						<button class="quiz__elem">{{ occasion.description }}</button>
+						{% endfor %}
 					</div>
 					<div class="quiz__progress">
 						<div class="quiz__progress_step">

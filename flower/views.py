@@ -1,10 +1,13 @@
+from decimal import Decimal
+
 import phonenumbers
 from django.contrib import messages
 from django.core.exceptions import ValidationError
+from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 
-from .models import Bouquet, Consultation, Occasions, Order
+from .models import Bouquet, Consultation, Occasions, Order, PromoCode
 
 BUDGETS = {
     "low": (0, 1000),
@@ -99,7 +102,7 @@ def consultation(request):
 def order(request, pk):
     bouquet = get_object_or_404(Bouquet, pk=pk)
     if request.method == "POST":
-        parsed = phonenumbers.parse(request.POST["tel"])
+        parsed = phonenumbers.parse(request.POST.get("tel"))
         if phonenumbers.is_valid_number(parsed):
             item = Order(
                 bouquet=bouquet,
@@ -111,13 +114,13 @@ def order(request, pk):
         else:
             return render(request, "order.html", {"bouquet": bouquet, "errors": {"phone_number": ["Неверный номер"]}})
 
-    try:
-        item.full_clean()
-    except ValidationError as error:
-        return render(request, "order.html", {"bouquet": bouquet, "errors": error.message_dict})
+        try:
+            item.full_clean()
+        except ValidationError as error:
+            return render(request, "order.html", {"bouquet": bouquet, "errors": error.message_dict})
 
-    item.save()
-    return redirect("flower:index")
+        item.save()
+        return redirect("flower:index")
 
     return render(request, "order.html", {"bouquet": bouquet})
 
@@ -167,3 +170,15 @@ def result(request):
         bouquets = bouquets.filter(price__gte=low, price__lt=high)
     bouquet = bouquets.order_by("?").first() or Bouquet.objects.order_by("?").first()
     return render(request, "result.html", {"bouquet": bouquet})
+
+
+def activate_promocode(request, pk):
+    bouquet = get_object_or_404(Bouquet, pk=pk)
+    promo = request.POST.get("promocode", "").strip().upper()
+    valid_promo = PromoCode.objects.filter(promocode=promo).exists()
+
+    if not valid_promo:
+        return HttpResponse("Промокод не найден", status=400)
+
+    new_price = bouquet.price * Decimal("0.9")
+    return HttpResponse(f"Промокод активирован! Цена: {new_price}")

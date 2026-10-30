@@ -80,3 +80,14 @@ class Occasions(models.Model):
 
     def __str__(self):
         return self.description
+
+
+class PromoCode(models.Model):
+    promo_code = models.CharField(max_length=15, blank=True, null=True, verbose_name='Промокод')
+
+    class Meta:
+        verbose_name = "Промокод"
+        verbose_name_plural = "Промокоды"
+
+    def __str__(self):
+        return f"{self.promo_code}"

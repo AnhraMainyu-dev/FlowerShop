@@ -83,7 +83,7 @@ class Occasions(models.Model):
 
 
 class PromoCode(models.Model):
-    promo_code = models.CharField(max_length=15, blank=True, null=True)
+    promo_code = models.CharField(max_length=15, blank=True, null=True, verbose_name='Промокод')
 
     class Meta:
         verbose_name = "Промокод"

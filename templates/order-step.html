@@ -37,6 +37,7 @@
 							{% endfor %}
 						</div>
 						{% endif %}
+
 						<div class="order__form_intro">Выбранный букет</div>
 						<div class="result__items_price">{{ bouquet.name }} - {% if price %}{{ price }}{% else %}{{ bouquet.price }}{% endif %} руб</div>
 						{% if errors %}

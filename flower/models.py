@@ -47,6 +47,7 @@ class Order(models.Model):
         blank=True,
         verbose_name="Статус",
     )
+    total_price = models.DecimalField(max_digits=7, decimal_places=0, verbose_name="Итоговая стоимость")
 
     class Meta:
         verbose_name = "Заказ"
@@ -83,11 +84,13 @@ class Occasions(models.Model):
 
 
 class PromoCode(models.Model):
-    promo_code = models.CharField(max_length=15, blank=True, null=True, verbose_name='Промокод')
+    promo_code = models.CharField(max_length=15, null=True, verbose_name="Промокод")
+    procent_promo = models.DecimalField(max_digits=5, decimal_places=2)
+    is_active = models.BooleanField(default=True, verbose_name="Активен?")
 
     class Meta:
         verbose_name = "Промокод"
         verbose_name_plural = "Промокоды"
 
     def __str__(self):
-        return f"{self.promo_code}"
+        return f"{self.promo_code} {self.is_active}"

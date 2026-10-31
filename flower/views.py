@@ -63,7 +63,7 @@ def order(request, pk):
                 date_deliver=SLOTS.get(request.POST.get("orderTime"), ""),
             )
         else:
-            return render(request, "order.html", {"bouquet": bouquet, "errors": {"phone_number": ["Неверный номер"]}})
+            return render(request, "order.html", {"bouquet": bouquet, "errors": {"400": ["Неверный номер"]}})
 
         try:
             item.full_clean()
@@ -101,12 +101,14 @@ def result(request):
 
 
 def activate_promocode(request, pk):
-    bouquet = get_object_or_404(Bouquet, pk=pk)
-    promo = request.POST.get("promocode", "").strip().upper()
-    valid_promo = PromoCode.objects.filter(promocode=promo).exists()
+    order = get_object_or_404(Order, pk=pk)
+    promo = request.POST.get("promocode", "")
+    valid_promo = PromoCode.objects.filter(promo_code=promo).exists()
 
     if not valid_promo:
         return HttpResponse("Промокод не найден", status=400)
 
-    new_price = bouquet.price * Decimal("0.9")
+    new_price = order.bouquet.price * Decimal("0.9")
+    order.total_price = new_price
+    order.save(update_fields=['total_price'])
     return HttpResponse(f"Промокод активирован! Цена: {new_price}")

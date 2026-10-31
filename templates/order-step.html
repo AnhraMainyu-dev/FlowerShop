@@ -37,12 +37,32 @@
 							{% endfor %}
 						</div>
 						{% endif %}
+						<div class="order__form_intro">Выбранный букет</div>
+						<div class="result__items_price">{{ bouquet.name }} - {% if price %}{{ price }}{% else %}{{ bouquet.price }}{% endif %} руб</div>
+						{% if errors %}
+						<div style="background-color: #D9FAF1; border: 2px solid #17CF97; color: #17CF97; padding: 15px; border-radius: 10px; margin-bottom: 20px; text-align: center; font-weight: bold; font-size: 16px;">
+							{% for field, error_list in errors.items %}
+								{% for error in error_list %}
+									<p>{{ error }}</p>
+								{% endfor %}
+							{% endfor %}
+						</div>
+						{% endif %}
+						<form method="get" action="{% url 'flower:order_step' %}" class="order__form">
+							<input type="hidden" name="order_id" value="{{ order_id }}">
+							<div class="order__form_intro">Промокод</div>
+							<div class="ficb">
+								<input type="text" name="promocode" class="order__form_input" style="width: 365px;" placeholder="Введите промокод" required>
+								<button type="submit" class="btn order__form_btn">Активировать</button>
+							</div>
+						</form>
+						<div class="order__form_line"></div>
 						<form method="post" action="{% url 'flower:order_step' %}" class="order__form orderStep_form">
 							{% csrf_token %}
 							<input type="hidden" name="order_id" value="{{ order_id }}">
 							<div class="order__form_block">
 								<div class="order__form_items">
-									<div class="order__form_intro">номер карты</div>
+									<div class="order__form_intro">Номер карты</div>
 									<input type="text" name="cardNum" class="order__form_input orderStep_form_input" placeholder="Введите номер" required>
 									<div class="order__form_item fic">
 										<input type="text" name="cardMm" class="order__form_input orderStep_form_input" placeholder="ММ" required>

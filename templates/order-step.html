@@ -30,7 +30,16 @@
 				<div class="order__block">
 					<div class="order_items">
 						<div class="title">Оплата</div>
-						<form action="#" class="order__form orderStep_form">
+						{% if messages %}
+						<div style="color: #17CF97; margin-bottom: 20px; text-align: center; font-weight: bold; font-size: 18px;">
+							{% for message in messages %}
+							<p>{{ message }}</p>
+							{% endfor %}
+						</div>
+						{% endif %}
+						<form method="post" action="{% url 'flower:order_step' %}" class="order__form orderStep_form">
+							{% csrf_token %}
+							<input type="hidden" name="order_id" value="{{ order_id }}">
 							<div class="order__form_block">
 								<div class="order__form_items">
 									<div class="order__form_intro">номер карты</div>
@@ -50,8 +59,8 @@
 							</div>
 							<div class="order__form_line"></div>
 							<div class="order__form_btns ficb">
-								<button class="btn order__form_pay">Оплатить</button>
-								<button class="btn order__form_btn">Назад</button>
+								<button type="submit" class="btn order__form_pay">Оплатить</button>
+								<a href="javascript:history.back()" class="btn order__form_btn">Назад</a>
 							</div>
 						</form>
 					</div>

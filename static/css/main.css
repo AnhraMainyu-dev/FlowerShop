@@ -402,6 +402,8 @@ margin-bottom: 30px;
 	background: #17CF97;
 	color: #FFFFFF;
 	margin-top: 50px;
+	display: inline-block;
+	line-height: 57px;
 }
 .card__btn:hover {
 	background: #14A87B;
@@ -647,22 +649,26 @@ input[type=radio]:checked + label {
 .order__form_pay {
 	width: 365px;
 	height: 57px;
+	display: inline-block;
+	line-height: 57px;
 }
 .order__form_btn {
 	width: 365px;
 	height: 57px;
 	background: #D9FAF1;
 	color: #17CF97;
+	display: inline-block;
+	line-height: 57px;
 }
 .order__form_btn:hover {
 	color: #fff;
 }
 .order__img {
-    position: absolute;
-    width: 511px;
-    right: 0;
-    top: 0;
-    height: 775px;
+	position: absolute;
+	width: 511px;
+	right: 0;
+	top: 0;
+	height: 775px;
 }
 
 #orderStep {

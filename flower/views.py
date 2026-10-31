@@ -98,32 +98,56 @@ def consultation(request):
 
 def order(request, pk):
     bouquet = get_object_or_404(Bouquet, pk=pk)
+
     if request.method == "POST":
-        parsed = phonenumbers.parse(request.POST["tel"])
-        if phonenumbers.is_valid_number(parsed):
-            item = Order(
-                bouquet=bouquet,
-                first_name=request.POST.get("fname", ""),
-                phone_number=request.POST.get("tel", ""),
-                address=request.POST.get("adres", ""),
-                date_deliver=SLOTS.get(request.POST.get("orderTime"), ""),
+        try:
+            parsed = phonenumbers.parse(request.POST["tel"], "RU")
+        except phonenumbers.NumberParseException:
+            return render(
+                request,
+                "order.html",
+                {"bouquet": bouquet, "errors": {"phone_number": ["Введите корректный номер телефона"]}},
             )
-        else:
+
+        if not phonenumbers.is_valid_number(parsed):
             return render(request, "order.html", {"bouquet": bouquet, "errors": {"phone_number": ["Неверный номер"]}})
 
-    try:
-        item.full_clean()
-    except ValidationError as error:
-        return render(request, "order.html", {"bouquet": bouquet, "errors": error.message_dict})
+        item = Order(
+            bouquet=bouquet,
+            first_name=request.POST.get("fname", ""),
+            phone_number=request.POST.get("tel", ""),
+            address=request.POST.get("adres", ""),
+            date_deliver=SLOTS.get(request.POST.get("orderTime"), ""),
+        )
 
-    item.save()
-    return redirect("flower:index")
+        try:
+            item.full_clean()
+        except ValidationError as error:
+            return render(request, "order.html", {"bouquet": bouquet, "errors": error.message_dict})
+
+        item.save()
+        return redirect(f"/order-step/?order_id={item.id}")
 
     return render(request, "order.html", {"bouquet": bouquet})
 
 
 def order_step(request):
-    return render(request, "order-step.html")
+    if request.method == "POST":
+        order_id = request.POST.get("order_id")
+
+        if order_id:
+            try:
+                order = Order.objects.get(id=order_id)
+                order.status = "WD"
+                order.save()
+            except Order.DoesNotExist:
+                pass
+
+        messages.success(request, "Оплата прошла успешно. Заказ принят в работу")
+        return redirect(reverse("flower:order_step"))
+
+    order_id = request.GET.get("order_id", "")
+    return render(request, "order-step.html", {"order_id": order_id})
 
 
 def quiz(request):
@@ -144,7 +168,6 @@ def result(request):
         try:
             item.full_clean()
         except ValidationError as error:
-            # Если ошибка — перерисовываем result.html с ошибками
             bouquets = Bouquet.objects.all()
             occasion = request.GET.get("occasion", "")
             if occasion.isdigit():

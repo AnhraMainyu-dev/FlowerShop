@@ -10,7 +10,16 @@ class BouquetAdmin(admin.ModelAdmin):
 
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
-    list_display = ["bouquet", "first_name", "address", "phone_number", "date_register", "date_deliver", "status"]
+    list_display = [
+        "bouquet",
+        "first_name",
+        "address",
+        "phone_number",
+        "date_register",
+        "date_deliver",
+        "status",
+        "total_price",
+    ]
 
 
 @admin.register(Consultation)

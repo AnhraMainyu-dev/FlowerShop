@@ -94,25 +94,31 @@ def order_step(request):
     order_id = request.POST.get("order_id") or request.GET.get("order_id", "")
     order = Order.objects.filter(pk=order_id).first() if order_id.isdigit() else None
 
-    if request.method == "POST":
-        if not order:
+    if not order:
+        if request.method == "POST":
             return render(request, "order-step.html", {"errors": {"order_id": ["Заказ не найден"]}})
+        return render(request, "order-step.html", {"order_id": order_id})
+
+    context = {"order_id": order_id, "bouquet": order.bouquet, "price": order.total_price}
+    promocode = request.GET.get("promocode", "")
+
+    if order.status != "RG" and (request.method == "POST" or promocode):
+        context["errors"] = {"order_id": ["Заказ уже оплачен"]}
+        return render(request, "order-step.html", context)
+
+    if request.method == "POST":
         order.status = "WD"
         order.save()
         messages.success(request, "Оплата прошла успешно. Заказ принят в работу")
         return redirect(reverse("flower:order_step") + f"?order_id={order.pk}")
 
-    if not order:
-        return render(request, "order-step.html", {"order_id": order_id})
-
-    context = {"order_id": order_id, "bouquet": order.bouquet, "price": order.total_price}
-    promocode = request.GET.get("promocode", "")
     if promocode:
         promo = PromoCode.objects.filter(promo_code__iexact=promocode, is_active=True).first()
         if promo:
             order.total_price = round(order.bouquet.price * (100 - promo.procent_promo) / 100)
             order.save(update_fields=["total_price"])
             context["price"] = order.total_price
+            messages.success(request, "Промокод применён")
         else:
             context["errors"] = {"promocode": ["Промокод не найден"]}
     return render(request, "order-step.html", context)

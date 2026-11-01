@@ -20,7 +20,7 @@ class Bouquet(models.Model):
 
 
 class Order(models.Model):
-    bouquet = models.ForeignKey(Bouquet, related_name="orders", verbose_name="Букет", on_delete=models.CASCADE)
+    bouquet = models.ForeignKey(Bouquet, related_name="orders", verbose_name="Букет", on_delete=models.PROTECT)
     first_name = models.CharField(max_length=30, verbose_name="Имя")
     address = models.CharField(max_length=100, verbose_name="Адрес")
     phone_number = PhoneNumberField(verbose_name="Телефон")

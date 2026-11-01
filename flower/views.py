@@ -59,9 +59,7 @@ def card(request, pk):
         try:
             item.full_clean()
         except ValidationError as error:
-            return render(
-                request, "card.html", {"bouquet": bouquet, "errors": error.message_dict}
-            )
+            return render(request, "card.html", {"bouquet": bouquet, "errors": error.message_dict})
         item.save()
         messages.success(request, "Заявка на консультацию успешно отправлена")
         return redirect(reverse("flower:card", args=[pk]) + "#consultation")
@@ -168,9 +166,7 @@ def quiz(request):
 
 
 def quiz_step(request):
-    return render(
-        request, "quiz-step.html", {"occasion": request.GET.get("occasion", "")}
-    )
+    return render(request, "quiz-step.html", {"occasion": request.GET.get("occasion", "")})
 
 
 def result(request):
@@ -190,9 +186,7 @@ def result(request):
             if request.GET.get("budget") in BUDGETS:
                 low, high = BUDGETS[request.GET["budget"]]
                 bouquets = bouquets.filter(price__gte=low, price__lt=high)
-            bouquet = (
-                bouquets.order_by("?").first() or Bouquet.objects.order_by("?").first()
-            )
+            bouquet = bouquets.order_by("?").first() or Bouquet.objects.order_by("?").first()
             return render(
                 request,
                 "result.html",

@@ -184,7 +184,7 @@ def result(request):
     bouquets = Bouquet.objects.all()
     occasion = request.GET.get("occasion", "")
     if occasion.isdigit():
-        bouquets = bouquets.filter(occasions=occasion)
+        bouquets = bouquets.filter(occasions__id=occasion)
     if request.GET.get("budget") in BUDGETS:
         low, high = BUDGETS[request.GET["budget"]]
         bouquets = bouquets.filter(price__gte=low, price__lt=high)

@@ -13,10 +13,10 @@
 	<header id="header">
 		<div class="container">
 			<div class="header ficb">
-				<a href="/"><img src="{% static 'img/logo.svg' %}" alt="logo" class="logo"></a>
+				<a href="{% url 'flower:index' %}"><img src="{% static 'img/logo.svg' %}" alt="logo" class="logo"></a>
 				<nav>
 					<ul class="menu ficc">
-						<li class="menu__item"><a href="#" class="menu__item_link">Каталог</a></li>
+						<li class="menu__item"><a href="{% url 'flower:catalog' %}" class="menu__item_link">Каталог</a></li>
 						<li class="menu__item"><a href="#" class="menu__item_link">Рекомендации</a></li>
 						<li class="menu__item"><a href="#" class="menu__item_link">Контакты</a></li>
 					</ul>
@@ -28,52 +28,31 @@
 		<div class="container">
 			<div class="card ficb">
 				<div class="card__block card__block_first">
-					<img src="{% static 'img/cardImg.jpg' %}" alt="img" class="card__img">
+					<img src="{{ bouquet.image.url }}" alt="{{ bouquet.name }}" class="card__img">
 				</div>
 				<div class="card__block card__block_sec">
-					<div class="title">Летнее утро</div>
-					<div class="card__block_price">3 600 руб</div>
+					<div class="title">{{ bouquet.name }}</div>
+					<div class="card__block_price">{{ bouquet.price }} руб</div>
 					<div class="card__elems ">
 						<span class="card__elems_intro">Состав</span>
 						<div class="card__items">
-							<span class="card_items_intro">
-								Гортензия розовая - 1 шт.
-							</span>
-							<span class="card_items_intro">
-								Ветки эквалипта - 5 шт.
-							</span>
-							<span class="card_items_intro">
-								Гипсофила - 1 шт.
-							</span>
-							<span class="card_items_intro">
-								Матовая упаковка - 1 шт.
-							</span>
-							<span class="card_items_intro">
-								Лента атласная - 1 шт.
-							</span>
-							<span class="card_items_intro">
-								Рекомендация по уходу - 1 шт.
-							</span>
-							<span class="card_items_intro">
-								Открыточка с вашими пожеланиями - 1 шт.
-							</span>
-							<span class="card_items_intro">
-								Любовь флориста (бесплатно) - 1 шт.
-							</span>
+							{% for item in bouquet.structure.splitlines %}
+							<span class="card_items_intro">{{ item }}</span>
+							{% endfor %}
 						</div>
 					</div>
 					<div class="card__elems ">
 						<span class="card__elems_intro">Размер</span>
 						<div class="card__items">
 							<span class="card_items_intro">
-								Высота - 50 см
+								Высота - {{ bouquet.height }} см
 							</span>
 							<span class="card_items_intro">
-								Ширина - 30 см
+								Ширина - {{ bouquet.width }} см
 							</span>
 						</div>
 					</div>
-					<button class="btn largeBtn card__btn">Заказать букет</button>
+					<a href="{% url 'flower:order' bouquet.pk %}" class="btn largeBtn card__btn">Заказать букет</a>
 				</div>
 			</div>
 		</div>
@@ -82,7 +61,24 @@
 		<div class="container">
 			<div class="consultation">
 				<div class="title consultation__title">Оставьте заявку на консультацию</div>
-				<form action="#" class="consultation__form">
+				{% if errors %}
+				<div style="background-color: #D9FAF1; border: 2px solid #17CF97; color: #17CF97; padding: 15px; border-radius: 10px; margin-bottom: 20px; text-align: center; font-weight: bold; font-size: 16px;">
+					{% for field, error_list in errors.items %}
+						{% for error in error_list %}
+							<p>{{ error }}</p>
+						{% endfor %}
+					{% endfor %}
+				</div>
+				{% endif %}
+				{% if messages %}
+				<div style="color: #fff; margin-bottom: 20px; text-align: center; font-weight: bold; font-size: 18px;">
+					{% for message in messages %}
+						<p style="margin: 0;">{{ message }}</p>
+					{% endfor %}
+				</div>
+				{% endif %}
+				<form method="post" action="{% url 'flower:card' bouquet.pk %}" class="consultation__form">
+					{% csrf_token %}
 					<input type="text" name="fname" class="consultation__form_input" placeholder="Введите Имя" required>
 					<input type="text" name="tel" class="consultation__form_input" placeholder="+ 7 (999) 000 00 00" required>
 					<button type="submit" class="consultation__form_btn">Отправить</button>
@@ -93,10 +89,10 @@
 	<footer id="footer">
 		<div class="container">
 			<div class="footer">
-				<a href="/"><img src="{% static 'img/logo.svg' %}" alt="logo" class="logo footer__logo"></a>
+				<a href="{% url 'flower:index' %}"><img src="{% static 'img/logo.svg' %}" alt="logo" class="logo footer__logo"></a>
 				<nav>
 					<ul class="menu footer__menu ficc">
-						<li class="menu__item"><a href="#" class="menu__item_link">Каталог</a></li>
+						<li class="menu__item"><a href="{% url 'flower:catalog' %}" class="menu__item_link">Каталог</a></li>
 						<li class="menu__item"><a href="#" class="menu__item_link">Рекомендации</a></li>
 						<li class="menu__item"><a href="#" class="menu__item_link">Контакты</a></li>
 					</ul>

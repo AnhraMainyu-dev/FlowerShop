@@ -13,10 +13,10 @@
 	<header id="header">
 		<div class="container">
 			<div class="header ficb">
-				<a href="/"><img src="{% static 'img/logo.svg' %}" alt="logo" class="logo"></a>
+				<a href="{% url 'flower:index' %}"><img src="{% static 'img/logo.svg' %}" alt="logo" class="logo"></a>
 				<nav>
 					<ul class="menu ficc">
-						<li class="menu__item"><a href="#" class="menu__item_link">Каталог</a></li>
+						<li class="menu__item"><a href="{% url 'flower:catalog' %}" class="menu__item_link">Каталог</a></li>
 						<li class="menu__item"><a href="#" class="menu__item_link">Рекомендации</a></li>
 						<li class="menu__item"><a href="#" class="menu__item_link">Контакты</a></li>
 					</ul>
@@ -28,20 +28,20 @@
 		<div class="container">
 			<div class="quiz">
 				<div class="quiz__back ">
-					<a href="#" class="quiz__back_link fic"><img src="{% static 'img/arrow-left.svg' %}" alt="arrow-left" class="arrowLeft">
+					<a href="{% url 'flower:quiz' %}" class="quiz__back_link fic"><img src="{% static 'img/arrow-left.svg' %}" alt="arrow-left" class="arrowLeft">
 					<span class="quiz__back_intro">Назад</span></a>
 				</div>
 				<div class="quiz__block">
 					<h1 class="quiz__title">На какой бюджет рассчитываете?</h1>
 					<div class="quiz__elems fic">
-						<button class="quiz__elem">До 1 000 руб</button>
-						<button class="quiz__elem">1 000 - 5 000 руб</button>
-						<button class="quiz__elem">от 5 000 руб</button>
-						<button class="quiz__elem">Не имеет значения</button>
+						<a href="{% url 'flower:result' %}?occasion={{ occasion }}&budget=low" class="quiz__elem">До 1 000 руб</a>
+						<a href="{% url 'flower:result' %}?occasion={{ occasion }}&budget=mid" class="quiz__elem">1 000 - 5 000 руб</a>
+						<a href="{% url 'flower:result' %}?occasion={{ occasion }}&budget=high" class="quiz__elem">от 5 000 руб</a>
+						<a href="{% url 'flower:result' %}?occasion={{ occasion }}&budget=none" class="quiz__elem">Не имеет значения</a>
 					</div>
 					<div class="quiz__progress">
 						<div class="quiz__progress_step">
-							<span class="quiz__progress_num">1</span>
+							<span class="quiz__progress_num">2</span>
 							<span class="quiz__progress_in"> шаг из </span>
 							<span class="quiz__progress_num">2</span>
 						</div>

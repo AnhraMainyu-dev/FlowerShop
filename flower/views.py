@@ -134,13 +134,12 @@ def quiz_step(request):
 
 def result(request):
     bouquets = Bouquet.objects.all()
-    occasion = request.GET.get("occasion", "")
-    if occasion.isdigit():
-        bouquets = bouquets.filter(occasions__id=occasion)
     if request.GET.get("budget") in BUDGETS:
         low, high = BUDGETS[request.GET["budget"]]
         bouquets = bouquets.filter(price__gte=low, price__lt=high)
-    context = {"bouquet": bouquets.order_by("?").first() or Bouquet.objects.order_by("?").first()}
+    occasion = request.GET.get("occasion", "")
+    by_occasion = bouquets.filter(occasions__id=occasion) if occasion.isdigit() else bouquets
+    context = {"bouquet": by_occasion.order_by("?").first() or bouquets.order_by("?").first()}
     if request.method == "POST":
         return save_consultation(request, "result.html", context, reverse("flower:result") + "#consultation")
     return render(request, "result.html", context)

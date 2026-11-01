@@ -17,8 +17,8 @@
 				<nav>
 					<ul class="menu ficc">
 						<li class="menu__item"><a href="{% url 'flower:catalog' %}" class="menu__item_link">Каталог</a></li>
-						<li class="menu__item"><a href="#" class="menu__item_link">Рекомендации</a></li>
-						<li class="menu__item"><a href="#" class="menu__item_link">Контакты</a></li>
+						<li class="menu__item"><a href="{% url 'flower:index' %}#recommended" class="menu__item_link">Рекомендации</a></li>
+						<li class="menu__item"><a href="{% url 'flower:index' %}#contacts" class="menu__item_link">Контакты</a></li>
 					</ul>
 				</nav>
 			</div>
@@ -79,6 +79,10 @@
 								</div>
 							</div>
 							<div class="order__form_line"></div>
+							<div class="chekbox fic">
+								<input type="checkbox" class="singUpConsultation__ckekbox" checked required>
+								<span class="chekbox__intro">Я согласен(а) с <a href="{% static 'pdf.pdf' %}" target="_blank">политикой конфиденциальности</a></span>
+							</div>
 							<div class="order__form_btns ficb">
 								<button type="submit" class="btn order__form_pay">Оплатить</button>
 								<a href="javascript:history.back()" class="btn order__form_btn">Назад</a>
@@ -98,12 +102,12 @@
 				<nav>
 					<ul class="menu footer__menu ficc">
 						<li class="menu__item"><a href="{% url 'flower:catalog' %}" class="menu__item_link">Каталог</a></li>
-						<li class="menu__item"><a href="#" class="menu__item_link">Рекомендации</a></li>
-						<li class="menu__item"><a href="#" class="menu__item_link">Контакты</a></li>
+						<li class="menu__item"><a href="{% url 'flower:index' %}#recommended" class="menu__item_link">Рекомендации</a></li>
+						<li class="menu__item"><a href="{% url 'flower:index' %}#contacts" class="menu__item_link">Контакты</a></li>
 					</ul>
 				</nav>
 				<hr class="line"></hr>
-				<a href="#" class="footer__poli">Политика конфиденциальности</a>
+				<a href="{% static 'pdf.pdf' %}" target="_blank" class="footer__poli">Политика конфиденциальности</a>
 				<p class="footer_cop">©️2022. FlowerShop. Все права защищены</p>
 			</div>
 		</div>

@@ -35,7 +35,11 @@ def index(request):
         try:
             item.full_clean()
         except ValidationError as error:
-            return render(request, "index.html", {"bouquets": Bouquet.objects.all()[:3], "errors": error.message_dict})
+            return render(
+                request,
+                "index.html",
+                {"bouquets": Bouquet.objects.all()[:3], "errors": error.message_dict},
+            )
         item.save()
         messages.success(request, "Заявка на консультацию успешно отправлена")
         return redirect(reverse("flower:index") + "#consultation")
@@ -55,7 +59,9 @@ def card(request, pk):
         try:
             item.full_clean()
         except ValidationError as error:
-            return render(request, "card.html", {"bouquet": bouquet, "errors": error.message_dict})
+            return render(
+                request, "card.html", {"bouquet": bouquet, "errors": error.message_dict}
+            )
         item.save()
         messages.success(request, "Заявка на консультацию успешно отправлена")
         return redirect(reverse("flower:card", args=[pk]) + "#consultation")
@@ -73,7 +79,11 @@ def catalog(request):
         try:
             item.full_clean()
         except ValidationError as error:
-            return render(request, "catalog.html", {"bouquets": Bouquet.objects.all(), "errors": error.message_dict})
+            return render(
+                request,
+                "catalog.html",
+                {"bouquets": Bouquet.objects.all(), "errors": error.message_dict},
+            )
         item.save()
         messages.success(request, "Заявка на консультацию успешно отправлена")
         return redirect(reverse("flower:catalog") + "#consultation")
@@ -113,12 +123,20 @@ def order(request, pk):
                 date_deliver=SLOTS.get(request.POST.get("orderTime"), ""),
             )
         else:
-            return render(request, "order.html", {"bouquet": bouquet, "errors": {"400": ["Неверный номер"]}})
+            return render(
+                request,
+                "order.html",
+                {"bouquet": bouquet, "errors": {"400": ["Неверный номер"]}},
+            )
 
         try:
             item.full_clean()
         except ValidationError as error:
-            return render(request, "order.html", {"bouquet": bouquet, "errors": error.message_dict})
+            return render(
+                request,
+                "order.html",
+                {"bouquet": bouquet, "errors": error.message_dict},
+            )
 
         item.save()
         return redirect("flower:index")
@@ -150,7 +168,9 @@ def quiz(request):
 
 
 def quiz_step(request):
-    return render(request, "quiz-step.html", {"occasion": request.GET.get("occasion", "")})
+    return render(
+        request, "quiz-step.html", {"occasion": request.GET.get("occasion", "")}
+    )
 
 
 def result(request):
@@ -170,8 +190,14 @@ def result(request):
             if request.GET.get("budget") in BUDGETS:
                 low, high = BUDGETS[request.GET["budget"]]
                 bouquets = bouquets.filter(price__gte=low, price__lt=high)
-            bouquet = bouquets.order_by("?").first() or Bouquet.objects.order_by("?").first()
-            return render(request, "result.html", {"bouquet": bouquet, "errors": error.message_dict})
+            bouquet = (
+                bouquets.order_by("?").first() or Bouquet.objects.order_by("?").first()
+            )
+            return render(
+                request,
+                "result.html",
+                {"bouquet": bouquet, "errors": error.message_dict},
+            )
         item.save()
         messages.success(request, "Заявка на консультацию успешно отправлена")
         return redirect(reverse("flower:result") + "#consultation")
@@ -197,5 +223,5 @@ def activate_promocode(request, pk):
 
     new_price = order.bouquet.price * Decimal("0.9")
     order.total_price = new_price
-    order.save(update_fields=['total_price'])
+    order.save(update_fields=["total_price"])
     return HttpResponse(f"Промокод активирован! Цена: {new_price}")

@@ -1,4 +1,4 @@
-black
-isort
-flake8
-Flake8-pyproject
+black==26.10.1
+isort==9.0.2
+flake8==7.5.0
+Flake8-pyproject==1.2.4

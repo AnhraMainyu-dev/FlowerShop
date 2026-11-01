@@ -84,7 +84,7 @@ class Occasions(models.Model):
 
 
 class PromoCode(models.Model):
-    promo_code = models.CharField(max_length=15, null=True, verbose_name="Промокод")
+    promo_code = models.CharField(max_length=15, unique=True, verbose_name="Промокод")
     procent_promo = models.DecimalField(max_digits=5, decimal_places=2)
     is_active = models.BooleanField(default=True, verbose_name="Активен?")
 

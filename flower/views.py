@@ -1,9 +1,5 @@
-from decimal import Decimal
-
-import phonenumbers
 from django.contrib import messages
 from django.core.exceptions import ValidationError
-from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 
@@ -111,22 +107,14 @@ def order(request, pk):
     bouquet = get_object_or_404(Bouquet, pk=pk)
 
     if request.method == "POST":
-        parsed = phonenumbers.parse(request.POST.get("tel"))
-        if phonenumbers.is_valid_number(parsed):
-            item = Order(
-                bouquet=bouquet,
-                first_name=request.POST.get("fname", ""),
-                phone_number=request.POST.get("tel", ""),
-                address=request.POST.get("adres", ""),
-                date_deliver=SLOTS.get(request.POST.get("orderTime"), ""),
-            )
-        else:
-            return render(
-                request,
-                "order.html",
-                {"bouquet": bouquet, "errors": {"400": ["Неверный номер"]}},
-            )
-
+        item = Order(
+            bouquet=bouquet,
+            first_name=request.POST.get("fname", ""),
+            phone_number=request.POST.get("tel", ""),
+            address=request.POST.get("adres", ""),
+            date_deliver=SLOTS.get(request.POST.get("orderTime"), ""),
+            total_price=bouquet.price,
+        )
         try:
             item.full_clean()
         except ValidationError as error:
@@ -137,28 +125,37 @@ def order(request, pk):
             )
 
         item.save()
-        return redirect("flower:index")
+        return redirect(reverse("flower:order_step") + f"?order_id={item.pk}")
 
     return render(request, "order.html", {"bouquet": bouquet})
 
 
 def order_step(request):
+    order_id = request.POST.get("order_id") or request.GET.get("order_id", "")
+    order = Order.objects.filter(pk=order_id).first() if order_id.isdigit() else None
+
     if request.method == "POST":
-        order_id = request.POST.get("order_id")
-
-        if order_id:
-            try:
-                order = Order.objects.get(id=order_id)
-                order.status = "WD"
-                order.save()
-            except Order.DoesNotExist:
-                pass
-
+        if not order:
+            return render(request, "order-step.html", {"errors": {"order_id": ["Заказ не найден"]}})
+        order.status = "WD"
+        order.save()
         messages.success(request, "Оплата прошла успешно. Заказ принят в работу")
-        return redirect(reverse("flower:order_step"))
+        return redirect(reverse("flower:order_step") + f"?order_id={order.pk}")
 
-    order_id = request.GET.get("order_id", "")
-    return render(request, "order-step.html", {"order_id": order_id})
+    if not order:
+        return render(request, "order-step.html", {"order_id": order_id})
+
+    context = {"order_id": order_id, "bouquet": order.bouquet, "price": order.total_price}
+    promocode = request.GET.get("promocode", "")
+    if promocode:
+        promo = PromoCode.objects.filter(promo_code__iexact=promocode, is_active=True).first()
+        if promo:
+            order.total_price = round(order.bouquet.price * (100 - promo.procent_promo) / 100)
+            order.save(update_fields=["total_price"])
+            context["price"] = order.total_price
+        else:
+            context["errors"] = {"promocode": ["Промокод не найден"]}
+    return render(request, "order-step.html", context)
 
 
 def quiz(request):
@@ -205,17 +202,3 @@ def result(request):
         bouquets = bouquets.filter(price__gte=low, price__lt=high)
     bouquet = bouquets.order_by("?").first() or Bouquet.objects.order_by("?").first()
     return render(request, "result.html", {"bouquet": bouquet})
-
-
-def activate_promocode(request, pk):
-    order = get_object_or_404(Order, pk=pk)
-    promo = request.POST.get("promocode", "")
-    valid_promo = PromoCode.objects.filter(promo_code=promo).exists()
-
-    if not valid_promo:
-        return HttpResponse("Промокод не найден", status=400)
-
-    new_price = order.bouquet.price * Decimal("0.9")
-    order.total_price = new_price
-    order.save(update_fields=["total_price"])
-    return HttpResponse(f"Промокод активирован! Цена: {new_price}")

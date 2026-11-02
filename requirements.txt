@@ -3,4 +3,4 @@ environs[django]==14.2.*
 django-phonenumber-field==9.0.0
 phonenumberslite==9.0.42
 pillow==13.0.0
-python-dotenv==1.2.4
+gunicorn==26.2.0

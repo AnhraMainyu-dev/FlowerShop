@@ -20,7 +20,7 @@ class Bouquet(models.Model):
 
 
 class Order(models.Model):
-    bouquet = models.ForeignKey(Bouquet, related_name="orders", verbose_name="Букет", on_delete=models.CASCADE)
+    bouquet = models.ForeignKey(Bouquet, related_name="orders", verbose_name="Букет", on_delete=models.PROTECT)
     first_name = models.CharField(max_length=30, verbose_name="Имя")
     address = models.CharField(max_length=100, verbose_name="Адрес")
     phone_number = PhoneNumberField(verbose_name="Телефон")
@@ -84,7 +84,7 @@ class Occasions(models.Model):
 
 
 class PromoCode(models.Model):
-    promo_code = models.CharField(max_length=15, null=True, verbose_name="Промокод")
+    promo_code = models.CharField(max_length=15, unique=True, verbose_name="Промокод")
     procent_promo = models.DecimalField(max_digits=5, decimal_places=2)
     is_active = models.BooleanField(default=True, verbose_name="Активен?")
 

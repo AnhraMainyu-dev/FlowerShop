@@ -17,8 +17,8 @@
 				<nav>
 					<ul class="menu ficc">
 						<li class="menu__item"><a href="{% url 'flower:catalog' %}" class="menu__item_link">Каталог</a></li>
-						<li class="menu__item"><a href="#" class="menu__item_link">Рекомендации</a></li>
-						<li class="menu__item"><a href="#" class="menu__item_link">Контакты</a></li>
+						<li class="menu__item"><a href="{% url 'flower:index' %}#recommended" class="menu__item_link">Рекомендации</a></li>
+						<li class="menu__item"><a href="{% url 'flower:index' %}#contacts" class="menu__item_link">Контакты</a></li>
 					</ul>
 				</nav>
 			</div>
@@ -119,6 +119,10 @@
 					<input type="text" name="fname" class="consultation__form_input" placeholder="Введите Имя" required>
 					<input type="text" name="tel" class="consultation__form_input" placeholder="+ 7 (999) 000 00 00" required>
 					<button type="submit" class="consultation__form_btn">Отправить</button>
+					<div class="chekbox fic">
+						<input type="checkbox" class="singUpConsultation__ckekbox" checked required>
+						<span class="chekbox__intro">Я согласен(а) с <a href="{% static 'pdf.pdf' %}" target="_blank">политикой конфиденциальности</a></span>
+					</div>
 				</form>
 			</div>
 		</div>
@@ -130,12 +134,12 @@
 				<nav>
 					<ul class="menu footer__menu ficc">
 						<li class="menu__item"><a href="{% url 'flower:catalog' %}" class="menu__item_link">Каталог</a></li>
-						<li class="menu__item"><a href="#" class="menu__item_link">Рекомендации</a></li>
-						<li class="menu__item"><a href="#" class="menu__item_link">Контакты</a></li>
+						<li class="menu__item"><a href="{% url 'flower:index' %}#recommended" class="menu__item_link">Рекомендации</a></li>
+						<li class="menu__item"><a href="{% url 'flower:index' %}#contacts" class="menu__item_link">Контакты</a></li>
 					</ul>
 				</nav>
 				<hr class="line"></hr>
-				<a href="#" class="footer__poli">Политика конфиденциальности</a>
+				<a href="{% static 'pdf.pdf' %}" target="_blank" class="footer__poli">Политика конфиденциальности</a>
 				<p class="footer_cop">©️2022. FlowerShop. Все права защищены</p>
 			</div>
 		</div>

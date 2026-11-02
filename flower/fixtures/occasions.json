@@ -12,7 +12,7 @@
     "pk": 2,
     "fields": {
       "description": "День рождения",
-      "bouquets": [1, 2, 4, 6]
+      "bouquets": [1, 2, 4, 6, 8, 9]
     }
   },
   {

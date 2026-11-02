@@ -1,9 +1,5 @@
-from decimal import Decimal
-
-import phonenumbers
 from django.contrib import messages
 from django.core.exceptions import ValidationError
-from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 
@@ -25,85 +21,45 @@ SLOTS = {
 }
 
 
-def index(request):
-    if request.method == "POST":
-        item = Consultation(
-            first_name=request.POST.get("fname", ""),
-            phone_number=request.POST.get("tel", ""),
-            confirmation=True,
-        )
-        try:
-            item.full_clean()
-        except ValidationError as error:
-            return render(
-                request,
-                "index.html",
-                {"bouquets": Bouquet.objects.all()[:3], "errors": error.message_dict},
-            )
-        item.save()
-        messages.success(request, "Заявка на консультацию успешно отправлена")
-        return redirect(reverse("flower:index") + "#consultation")
+def save_consultation(request, template, context, redirect_url):
+    item = Consultation(
+        first_name=request.POST.get("fname", ""),
+        phone_number=request.POST.get("tel", ""),
+        confirmation=True,
+    )
+    try:
+        item.full_clean()
+    except ValidationError as error:
+        return render(request, template, {**context, "errors": error.message_dict})
+    item.save()
+    messages.success(request, "Заявка на консультацию успешно отправлена")
+    return redirect(redirect_url)
 
-    return render(request, "index.html", {"bouquets": Bouquet.objects.all()[:3]})
+
+def index(request):
+    context = {"bouquets": Bouquet.objects.all()[:3]}
+    if request.method == "POST":
+        return save_consultation(request, "index.html", context, reverse("flower:index") + "#consultation")
+    return render(request, "index.html", context)
 
 
 def card(request, pk):
-    bouquet = get_object_or_404(Bouquet, pk=pk)
-
+    context = {"bouquet": get_object_or_404(Bouquet, pk=pk)}
     if request.method == "POST":
-        item = Consultation(
-            first_name=request.POST.get("fname", ""),
-            phone_number=request.POST.get("tel", ""),
-            confirmation=True,
-        )
-        try:
-            item.full_clean()
-        except ValidationError as error:
-            return render(request, "card.html", {"bouquet": bouquet, "errors": error.message_dict})
-        item.save()
-        messages.success(request, "Заявка на консультацию успешно отправлена")
-        return redirect(reverse("flower:card", args=[pk]) + "#consultation")
-
-    return render(request, "card.html", {"bouquet": bouquet})
+        return save_consultation(request, "card.html", context, reverse("flower:card", args=[pk]) + "#consultation")
+    return render(request, "card.html", context)
 
 
 def catalog(request):
+    context = {"bouquets": Bouquet.objects.all()}
     if request.method == "POST":
-        item = Consultation(
-            first_name=request.POST.get("fname", ""),
-            phone_number=request.POST.get("tel", ""),
-            confirmation=True,
-        )
-        try:
-            item.full_clean()
-        except ValidationError as error:
-            return render(
-                request,
-                "catalog.html",
-                {"bouquets": Bouquet.objects.all(), "errors": error.message_dict},
-            )
-        item.save()
-        messages.success(request, "Заявка на консультацию успешно отправлена")
-        return redirect(reverse("flower:catalog") + "#consultation")
-
-    return render(request, "catalog.html", {"bouquets": Bouquet.objects.all()})
+        return save_consultation(request, "catalog.html", context, reverse("flower:catalog") + "#consultation")
+    return render(request, "catalog.html", context)
 
 
 def consultation(request):
     if request.method == "POST":
-        item = Consultation(
-            first_name=request.POST.get("fname", ""),
-            phone_number=request.POST.get("tel", ""),
-            confirmation=True,
-        )
-        try:
-            item.full_clean()
-        except ValidationError as error:
-            return render(request, "consultation.html", {"errors": error.message_dict})
-        item.save()
-        messages.success(request, "Заявка на консультацию успешно отправлена")
-        return redirect(reverse("flower:consultation"))
-
+        return save_consultation(request, "consultation.html", {}, reverse("flower:consultation"))
     return render(request, "consultation.html")
 
 
@@ -111,22 +67,14 @@ def order(request, pk):
     bouquet = get_object_or_404(Bouquet, pk=pk)
 
     if request.method == "POST":
-        parsed = phonenumbers.parse(request.POST.get("tel"))
-        if phonenumbers.is_valid_number(parsed):
-            item = Order(
-                bouquet=bouquet,
-                first_name=request.POST.get("fname", ""),
-                phone_number=request.POST.get("tel", ""),
-                address=request.POST.get("adres", ""),
-                date_deliver=SLOTS.get(request.POST.get("orderTime"), ""),
-            )
-        else:
-            return render(
-                request,
-                "order.html",
-                {"bouquet": bouquet, "errors": {"400": ["Неверный номер"]}},
-            )
-
+        item = Order(
+            bouquet=bouquet,
+            first_name=request.POST.get("fname", ""),
+            phone_number=request.POST.get("tel", ""),
+            address=request.POST.get("adres", ""),
+            date_deliver=SLOTS.get(request.POST.get("orderTime"), ""),
+            total_price=bouquet.price,
+        )
         try:
             item.full_clean()
         except ValidationError as error:
@@ -137,28 +85,43 @@ def order(request, pk):
             )
 
         item.save()
-        return redirect("flower:index")
+        return redirect(reverse("flower:order_step") + f"?order_id={item.pk}")
 
     return render(request, "order.html", {"bouquet": bouquet})
 
 
 def order_step(request):
+    order_id = request.POST.get("order_id") or request.GET.get("order_id", "")
+    order = Order.objects.filter(pk=order_id).first() if order_id.isdigit() else None
+
+    if not order:
+        if request.method == "POST":
+            return render(request, "order-step.html", {"errors": {"order_id": ["Заказ не найден"]}})
+        return render(request, "order-step.html", {"order_id": order_id})
+
+    context = {"order_id": order_id, "bouquet": order.bouquet, "price": order.total_price}
+    promocode = request.GET.get("promocode", "")
+
+    if order.status != "RG" and (request.method == "POST" or promocode):
+        context["errors"] = {"order_id": ["Заказ уже оплачен"]}
+        return render(request, "order-step.html", context)
+
     if request.method == "POST":
-        order_id = request.POST.get("order_id")
-
-        if order_id:
-            try:
-                order = Order.objects.get(id=order_id)
-                order.status = "WD"
-                order.save()
-            except Order.DoesNotExist:
-                pass
-
+        order.status = "WD"
+        order.save()
         messages.success(request, "Оплата прошла успешно. Заказ принят в работу")
-        return redirect(reverse("flower:order_step"))
+        return redirect(reverse("flower:order_step") + f"?order_id={order.pk}")
 
-    order_id = request.GET.get("order_id", "")
-    return render(request, "order-step.html", {"order_id": order_id})
+    if promocode:
+        promo = PromoCode.objects.filter(promo_code__iexact=promocode, is_active=True).first()
+        if promo:
+            order.total_price = round(order.bouquet.price * (100 - promo.procent_promo) / 100)
+            order.save(update_fields=["total_price"])
+            context["price"] = order.total_price
+            messages.success(request, "Промокод применён")
+        else:
+            context["errors"] = {"promocode": ["Промокод не найден"]}
+    return render(request, "order-step.html", context)
 
 
 def quiz(request):
@@ -170,52 +133,13 @@ def quiz_step(request):
 
 
 def result(request):
-    if request.method == "POST":
-        item = Consultation(
-            first_name=request.POST.get("fname", ""),
-            phone_number=request.POST.get("tel", ""),
-            confirmation=True,
-        )
-        try:
-            item.full_clean()
-        except ValidationError as error:
-            bouquets = Bouquet.objects.all()
-            occasion = request.GET.get("occasion", "")
-            if occasion.isdigit():
-                bouquets = bouquets.filter(occasions=occasion)
-            if request.GET.get("budget") in BUDGETS:
-                low, high = BUDGETS[request.GET["budget"]]
-                bouquets = bouquets.filter(price__gte=low, price__lt=high)
-            bouquet = bouquets.order_by("?").first() or Bouquet.objects.order_by("?").first()
-            return render(
-                request,
-                "result.html",
-                {"bouquet": bouquet, "errors": error.message_dict},
-            )
-        item.save()
-        messages.success(request, "Заявка на консультацию успешно отправлена")
-        return redirect(reverse("flower:result") + "#consultation")
-
     bouquets = Bouquet.objects.all()
-    occasion = request.GET.get("occasion", "")
-    if occasion.isdigit():
-        bouquets = bouquets.filter(occasions__id=occasion)
     if request.GET.get("budget") in BUDGETS:
         low, high = BUDGETS[request.GET["budget"]]
         bouquets = bouquets.filter(price__gte=low, price__lt=high)
-    bouquet = bouquets.order_by("?").first() or Bouquet.objects.order_by("?").first()
-    return render(request, "result.html", {"bouquet": bouquet})
-
-
-def activate_promocode(request, pk):
-    order = get_object_or_404(Order, pk=pk)
-    promo = request.POST.get("promocode", "")
-    valid_promo = PromoCode.objects.filter(promo_code=promo).exists()
-
-    if not valid_promo:
-        return HttpResponse("Промокод не найден", status=400)
-
-    new_price = order.bouquet.price * Decimal("0.9")
-    order.total_price = new_price
-    order.save(update_fields=["total_price"])
-    return HttpResponse(f"Промокод активирован! Цена: {new_price}")
+    occasion = request.GET.get("occasion", "")
+    by_occasion = bouquets.filter(occasions__id=occasion) if occasion.isdigit() else bouquets
+    context = {"bouquet": by_occasion.order_by("?").first() or bouquets.order_by("?").first()}
+    if request.method == "POST":
+        return save_consultation(request, "result.html", context, reverse("flower:result") + "#consultation")
+    return render(request, "result.html", context)

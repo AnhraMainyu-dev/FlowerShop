@@ -89,5 +89,31 @@
       "structure": "Тюльпан - 9 шт.\nЭвкалипт - 3 шт.\nМатовая упаковка - 1 шт.\nЛента атласная - 1 шт.",
       "price": "3200"
     }
+  },
+  {
+    "model": "flower.bouquet",
+    "pk": 8,
+    "fields": {
+      "name": "100 роз",
+      "height": 45,
+      "width": 45,
+      "description": "100 роз, как в песне.\nДорого и красиво",
+      "image": "bouquet/images_3.jfif",
+      "structure": "Розы - 100шт.\nКрафтовая упаковка - 1 шт.",
+      "price": "15000"
+    }
+  },
+  {
+    "model": "flower.bouquet",
+    "pk": 9,
+    "fields": {
+      "name": "1 роза",
+      "height": 45,
+      "width": 15,
+      "description": "Для тех, для кого внимание дороже материального",
+      "image": "bouquet/62f1e2ff3efcb842a8ae628566c085d1.jpeg",
+      "structure": "Роза - 1 шт.\nМатовая упаковка - 1 шт.\nЛента атласная - 1 шт.",
+      "price": "150"
+    }
   }
 ]

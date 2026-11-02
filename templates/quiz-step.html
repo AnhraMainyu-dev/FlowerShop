@@ -17,8 +17,8 @@
 				<nav>
 					<ul class="menu ficc">
 						<li class="menu__item"><a href="{% url 'flower:catalog' %}" class="menu__item_link">Каталог</a></li>
-						<li class="menu__item"><a href="#" class="menu__item_link">Рекомендации</a></li>
-						<li class="menu__item"><a href="#" class="menu__item_link">Контакты</a></li>
+						<li class="menu__item"><a href="{% url 'flower:index' %}#recommended" class="menu__item_link">Рекомендации</a></li>
+						<li class="menu__item"><a href="{% url 'flower:index' %}#contacts" class="menu__item_link">Контакты</a></li>
 					</ul>
 				</nav>
 			</div>
@@ -37,7 +37,7 @@
 						<a href="{% url 'flower:result' %}?occasion={{ occasion }}&budget=low" class="quiz__elem">До 1 000 руб</a>
 						<a href="{% url 'flower:result' %}?occasion={{ occasion }}&budget=mid" class="quiz__elem">1 000 - 5 000 руб</a>
 						<a href="{% url 'flower:result' %}?occasion={{ occasion }}&budget=high" class="quiz__elem">от 5 000 руб</a>
-						<a href="{% url 'flower:result' %}?occasion={{ occasion }}&budget=none" class="quiz__elem">Не имеет значения</a>
+						<a href="{% url 'flower:result' %}?occasion={{ occasion }}" class="quiz__elem">Не имеет значения</a>
 					</div>
 					<div class="quiz__progress">
 						<div class="quiz__progress_step">
